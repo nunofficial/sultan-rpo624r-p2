@@ -1,0 +1,91 @@
+:root {
+    --kaspi-red: #dc3545;
+}
+
+body {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] body {
+    background-color: #121212;
+}
+
+/* Navbar */
+.navbar {
+    transition: background-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .navbar {
+    background-color: #1e1e1e !important;
+}
+
+.navbar-brand {
+    letter-spacing: -1px;
+}
+
+/* Тема и иконки */
+.theme-toggle {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+[data-bs-theme="dark"] .theme-toggle:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Карточки и списки */
+.card, .list-group-item {
+    background-color: var(--bs-tertiary-bg);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    z-index: 1;
+}
+
+.list-group-item {
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+
+.list-group-item.active {
+    background-color: var(--kaspi-red) !important;
+    border-color: var(--kaspi-red) !important;
+    color: white !important;
+}
+
+/* Формы и поиск */
+input, select, textarea {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+input::placeholder {
+    color: var(--bs-secondary-color) !important;
+    opacity: 0.7;
+}
+
+/* Пагинация */
+.page-link {
+    color: var(--bs-body-color);
+    background-color: var(--bs-tertiary-bg);
+    border: none;
+}
+
+.page-item.active .page-link {
+    background-color: var(--kaspi-red);
+    color: white;
+}
+
+/* Прочее */
+.text-body {
+    color: var(--bs-body-color) !important;
+}

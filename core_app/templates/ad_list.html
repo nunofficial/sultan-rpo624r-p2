@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row mb-4 animate-fade-in">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-body-tertiary">
+            <form method="get" class="d-flex gap-2">
+                <input type="text" name="q" class="form-control form-control-lg border-0 bg-body shadow-none w-100 transition-focus" placeholder="Я ищу..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-danger btn-lg px-4 rounded-3 btn-hover-shake">Найти</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="list-group shadow-sm border-0 rounded-4 overflow-hidden animate-slide-left">
+            <a href="{% url 'ad_list' %}" class="list-group-item list-group-item-action py-3 border-0 transition-all {% if not current_category %}active bg-danger{% endif %}">🌍 Все категории</a>
+            {% for cat in categories %}
+                <a href="?category={{ cat.slug }}" class="list-group-item list-group-item-action py-3 border-0 transition-all {% if current_category == cat.slug %}active bg-danger{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        {% if vip_ads %}
+        <div class="mb-5 animate-fade-in" style="animation-delay: 0.1s;">
+            <h4 class="fw-bold mb-3 text-body">⭐ TOP - Рекомендуемые</h4>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+                {% for ad in vip_ads %}
+                <div class="col animate-card-pop" style="animation-delay: {{ forloop.counter|add:2 }}00ms;">
+                    <div class="card h-100 border-warning border-2 shadow-sm rounded-4 overflow-hidden bg-body-tertiary card-hover-effect">
+                        <a href="{% url 'ad_detail' ad.uuid %}" class="text-decoration-none text-body">
+                            {% if ad.image %}<img src="{{ ad.image }}" class="card-img-top img-zoom" style="height: 180px; object-fit: cover;">{% endif %}
+                            <div class="card-body p-3">
+                                <h6 class="fw-bold text-truncate mb-1">{{ ad.title }}</h6>
+                                <p class="text-danger fw-bold mb-0 fs-5">{{ ad.price }} ₸</p>
+                                <p class="text-muted small mb-0">{{ ad.city.name }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <hr class="my-5 opacity-10">
+        </div>
+        {% endif %}
+
+        <h4 class="fw-bold mb-3 text-muted animate-fade-in" style="animation-delay: 0.2s;">Свежие объявления</h4>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+            {% for ad in page_obj %}
+            <div class="col animate-card-pop" style="animation-delay: {{ forloop.counter|add:5 }}00ms;">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-body-tertiary card-hover-effect">
+                    <a href="{% url 'ad_detail' ad.uuid %}" class="text-decoration-none text-body">
+                        {% if ad.image %}<img src="{{ ad.image }}" class="card-img-top img-zoom" style="height: 180px; object-fit: cover;">{% endif %}
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold text-truncate mb-1">{{ ad.title }}</h6>
+                            <p class="text-danger fw-bold fs-5 mb-1">{{ ad.price }} ₸</p>
+                            <p class="text-muted small mb-0">{{ ad.city.name }}</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 py-5 text-center fade-in">
+                <p class="text-muted">Объявлений пока нет</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes cardPop {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    .animate-slide-left { animation: slideLeft 0.5s ease-out forwards; }
+    .animate-card-pop { opacity: 0; animation: cardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+    .card-hover-effect {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover-effect:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+
+    .img-zoom {
+        transition: transform 0.5s ease;
+    }
+
+    .card-hover-effect:hover .img-zoom {
+        transform: scale(1.08);
+    }
+
+    .transition-all { transition: all 0.2s ease; }
+    
+    .list-group-item:hover:not(.active) {
+        padding-left: 1.5rem !important;
+        background-color: var(--bs-body-bg);
+        color: #dc3545;
+    }
+
+    .transition-focus {
+        transition: all 0.3s ease;
+        border: 1px solid transparent !important;
+    }
+
+    .transition-focus:focus {
+        transform: scale(1.01);
+        border-color: rgba(220, 53, 69, 0.2) !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+    }
+
+    .btn-hover-shake:hover {
+        animation: shake 0.3s infinite;
+    }
+</style>
+{% endblock %}

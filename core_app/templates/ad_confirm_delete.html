@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Подтверждение удаления{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+            <h2 class="fw-bold mb-4">Удалить объявление?</h2>
+            <p class="text-muted fs-5 mb-4">
+                Вы уверены, что хотите безвозвратно удалить <br>
+                <strong>«{{ ad.title }}»</strong>?
+            </p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                    <a href="{% url 'profile' %}" class="btn btn-light btn-lg px-4 rounded-pill">Отмена</a>
+                    <button type="submit" class="btn btn-danger btn-lg px-4 rounded-pill">Да, удалить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

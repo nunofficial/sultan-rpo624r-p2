@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 animate-fade-in">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 shadow-hover">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="display-4 mb-2 animate-bounce-low">👋</div>
+                    <h2 class="fw-bold">Создать аккаунт</h2>
+                </div>
+                
+                <form method="post" id="register-form" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3 animate-input" style="animation-delay: {{ forloop.counter0|add:1 }}00ms;">
+                            <label class="form-label fw-semibold text-secondary small text-uppercase">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text small text-muted opacity-75">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1 animate-shake">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold shadow-danger transition-all">
+                            Зарегистрироваться
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4 opacity-10">
+                <p class="text-center mb-0">Уже есть аккаунт? <a href="{% url 'login' %}" class="text-danger text-decoration-none fw-bold link-underline-hover">Войти</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.classList.add('form-control', 'form-control-lg', 'rounded-3', 'border-0', 'bg-body-tertiary', 'shadow-none', 'transition-focus');
+            input.style.border = "1px solid var(--bs-border-color)";
+        });
+    });
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes inputSlide {
+        from { opacity: 0; transform: translateX(-15px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes bounceLow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-input {
+        opacity: 0;
+        animation: inputSlide 0.5s ease-out forwards;
+    }
+
+    .animate-shake {
+        animation: shake 0.4s ease-in-out;
+    }
+
+    .animate-bounce-low {
+        display: inline-block;
+        animation: bounceLow 3s ease-in-out infinite;
+    }
+
+    .shadow-hover {
+        transition: all 0.3s ease;
+    }
+
+    .shadow-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+
+    .form-control {
+        background-color: var(--bs-tertiary-bg) !important;
+        border: 1px solid var(--bs-border-color) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .transition-focus {
+        transition: all 0.3s ease;
+    }
+
+    .transition-focus:focus {
+        background-color: var(--bs-body-bg) !important;
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15) !important;
+        transform: scale(1.01);
+    }
+
+    .shadow-danger {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .shadow-danger:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+
+    .shadow-danger:active {
+        transform: scale(0.98);
+    }
+
+    .link-underline-hover:hover {
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--bs-body-color);
+        -webkit-box-shadow: 0 0 0px 1000px var(--bs-tertiary-bg) inset;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+</style>
+{% endblock %}

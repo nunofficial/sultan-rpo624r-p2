@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% block title %}{{ ad.title }}{% endblock %}
+
+{% block content %}
+<div class="row g-4 animate-fade-in">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-body-tertiary shadow-hover">
+            {% if ad.image %}
+                <div class="overflow-hidden">
+                    <img src="{{ ad.image }}" class="w-100 img-zoom" style="max-height: 500px; object-fit: cover;">
+                </div>
+            {% endif %}
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between mb-3 text-muted small opacity-75">
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">{{ ad.category.name }}</span>
+                    <span>📍 {{ ad.city.name }} • {{ ad.created_at|date:"d E Y" }}</span>
+                </div>
+                <h1 class="fw-bold mb-4 display-6">{{ ad.title }}</h1>
+                <h5 class="fw-bold mb-3 d-flex align-items-center">
+                    <span class="me-2 text-danger">📋</span> Описание
+                </h5>
+                <p class="fs-5 text-secondary lh-base" style="white-space: pre-line;">{{ ad.description }}</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-body-tertiary mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0">Отзывы</h4>
+                <div class="badge bg-warning text-dark fs-6 rounded-pill px-3 shadow-sm animate-bounce-low">
+                    ⭐ {{ avg_rating|default:"0" }} / 5.0
+                </div>
+            </div>
+
+            {% if request.user.is_authenticated and request.user != ad.author %}
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-body animate-input">
+                    <h6 class="fw-bold mb-3">Оставить отзыв</h6>
+                    <form method="post" id="review-form">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-secondary text-uppercase">Ваша оценка</label>
+                                {{ form.rating }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary text-uppercase">Ваш комментарий</label>
+                                {{ form.text }}
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-danger transition-all">
+                                    Отправить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+
+            <div class="reviews-list">
+                {% for review in reviews %}
+                    <div class="pb-4 mb-4 border-bottom border-secondary-subtle animate-list-item" style="animation-delay: {{ forloop.counter0 }}00ms;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-secondary-subtle rounded-circle me-2 d-flex align-items-center justify-content-center fw-bold text-secondary" style="width: 35px; height: 35px; font-size: 0.8rem;">
+                                    {{ review.author.username|first|upper }}
+                                </div>
+                                <div>
+                                    <span class="fw-bold d-block">{{ review.author.username }}</span>
+                                    <div class="text-warning small">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted opacity-75">{{ review.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                        <p class="mb-0 text-secondary ps-5" style="font-size: 0.95rem;">{{ review.text }}</p>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5 opacity-50">
+                        <div class="display-1 mb-2">💬</div>
+                        <p>Отзывов пока нет. Будьте первым!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 sticky-top bg-body-tertiary" style="top: 100px; transition: transform 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="price-tag mb-4 text-center p-3 rounded-4 bg-danger bg-opacity-10">
+                    <h2 class="text-danger fw-bold mb-0">
+                        {% if ad.price == 0 %}Бесплатно{% else %}{{ ad.price }} ₸{% endif %}
+                    </h2>
+                </div>
+
+                <div class="author-card d-flex align-items-center mb-4 p-3 border border-secondary-subtle rounded-4 bg-body shadow-sm transition-all">
+                    <div class="bg-danger rounded-circle text-white d-flex justify-content-center align-items-center fs-4 me-3 fw-bold shadow-danger" style="width: 55px; height: 55px; flex-shrink: 0;">
+                        {{ ad.author.username|first|upper }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <h6 class="mb-0 fw-bold text-truncate">
+                            {{ ad.author.get_full_name|default:ad.author.username }}
+                        </h6>
+                        <div class="text-warning small mb-1">⭐ 5.0 <span class="text-muted fs-xs">(рейтинг)</span></div>
+                        <small class="text-muted d-block small">На сайте с {{ ad.author.date_joined|date:"Y" }}г.</small>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <button id="show-seller-btn" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm transition-all" onclick="showSellerData()">
+                        📞 Показать контакты
+                    </button>
+                    
+                    <div id="seller-data" class="d-none border border-primary border-opacity-25 rounded-4 p-3 text-center bg-primary bg-opacity-10 animate-fade-in">
+                        <p class="mb-1 fw-bold text-primary">{{ ad.author.get_full_name|default:ad.author.username }}</p>
+                        <a href="mailto:{{ ad.author.email }}" class="text-decoration-none fw-bold fs-5 text-primary">{{ ad.author.email|default:"Email скрыт" }}</a>
+                    </div>
+                    
+                    <a href="{% url 'toggle_favorite' ad.uuid %}" class="btn {% if is_favorite %}btn-danger shadow-danger{% else %}btn-outline-danger{% endif %} btn-lg rounded-pill py-2 transition-all">
+                        {% if is_favorite %}❤️ В избранном{% else %}♡ В избранное{% endif %}
+                    </a>
+                </div>
+
+                {% if request.user == ad.author %}
+                    <hr class="my-4 opacity-10">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'ad_update' ad.uuid %}" class="btn btn-outline-secondary rounded-pill w-50 py-2 transition-all">Изменить</a>
+                        <a href="{% url 'ad_delete' ad.uuid %}" class="btn btn-outline-danger rounded-pill w-50 py-2 transition-all">Удалить</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showSellerData() {
+    const btn = document.getElementById('show-seller-btn');
+    const dataBox = document.getElementById('seller-data');
+    if (btn && dataBox) {
+        btn.style.display = 'none';
+        dataBox.classList.remove('d-none');
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const inputs = document.querySelectorAll('#review-form select, #review-form textarea');
+    inputs.forEach(input => {
+        input.classList.add('form-control', 'rounded-3', 'border-0', 'bg-body-tertiary', 'shadow-none', 'transition-focus');
+    });
+});
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-15px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes bounceLow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-list-item { opacity: 0; animation: slideIn 0.4s ease-out forwards; }
+    .animate-bounce-low { display: inline-block; animation: bounceLow 3s ease-in-out infinite; }
+
+    .img-zoom { transition: transform 0.5s ease; }
+    .card:hover .img-zoom { transform: scale(1.03); }
+
+    .shadow-hover:hover {
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+
+    .form-control:focus {
+        background-color: var(--bs-body-bg) !important;
+        border: 1px solid rgba(220, 53, 69, 0.3) !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.1) !important;
+    }
+
+    .transition-all { transition: all 0.3s ease; }
+    .transition-all:hover { transform: translateY(-2px); }
+    .transition-all:active { transform: scale(0.98); }
+
+    .shadow-danger { box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2); }
+    
+    .author-card:hover { border-color: #dc3545 !important; }
+
+    .fs-xs { font-size: 0.7rem; }
+
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px var(--bs-tertiary-bg) inset;
+    }
+</style>
+{% endblock %}
